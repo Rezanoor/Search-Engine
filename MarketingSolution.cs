@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Collections;
 
-namespace Orchard_Marketing_Solution
+namespace Marketing_Solution
 {
     class Program
     {
