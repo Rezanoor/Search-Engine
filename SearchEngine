@@ -1,0 +1,72 @@
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Text.RegularExpressions;
+using System.Collections;
+using Orchard_Marketing_Solution.Test;
+using Orchard_Marketing_Solution.Utils;
+
+ /*
+  * Author: Reza Nourbakhsh - rezanoorbakhsh@ymail.com
+ */
+namespace Orchard_Marketing_Solution
+{
+    class Program
+    {
+
+        static void Main(string[] args)
+        {
+          
+            foreach (Promotion p in Test.Test.getPromotionList())
+            {
+                if (!Utils.Util.validate(p))
+                {
+                    Console.WriteLine("Validation failed for " + p.name);
+                    continue;
+                }
+                foreach (OnlinePromotion op in Test.Test.getOnlinePromotionList())
+                {
+                    if (!Utils.Util.validate(op))
+                    {
+                        Console.WriteLine("Validation failed for " + op.name);
+                        continue;
+                    }
+                    foreach (Type mytype in System.Reflection.Assembly.GetExecutingAssembly().GetTypes().Where(mytype => mytype.GetInterfaces().Contains(typeof(IPromotionMatcher))))
+                    {
+                    
+                        Type promotionMatcherObj = Type.GetType(mytype.FullName);
+
+                        IPromotionMatcher obj = 
+                            promotionMatcherObj != null ?
+                            (IPromotionMatcher)Activator.CreateInstance(promotionMatcherObj) : null;
+
+                        if (obj != null)
+                        {
+                            
+                            Console.WriteLine(
+                                  p.name 
+                                + " is " 
+                                + (obj.IsMatch(op, p) == true ? " " : " NOT ")
+                                + " A "
+                                + mytype.Name.ToString()
+                                + " match with "
+                                + op.name);
+                                
+                        }
+                        else
+                        {
+                            Console.WriteLine("Sorry, we could not identify the promotion type for" + p.name);
+                        }
+                    }
+                }
+            }
+       
+            //To view
+            Console.ReadLine();
+        }
+    }
+}
+
